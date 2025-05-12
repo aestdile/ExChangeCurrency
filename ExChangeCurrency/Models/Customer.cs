@@ -1,4 +1,5 @@
-﻿namespace CurrencyCource.Models
+﻿
+namespace CurrencyCource.Models
 {
     public class Customer
     {
