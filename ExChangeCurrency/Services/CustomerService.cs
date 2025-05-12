@@ -685,6 +685,52 @@ namespace CurrencyCource.Services
         }
 
 
+        /*-----------------Get Balance-----------------*/
+        public void GetBalance()
+        {
+            Console.Clear();
+            Console.WriteLine("----------------Get Balance-----------------\n");
+
+            List<Customer> customers = new List<Customer>();
+            if (File.Exists(FilePath))
+            {
+                string json = System.IO.File.ReadAllText(FilePath);
+                customers = Newtonsoft.Json.JsonConvert.DeserializeObject<List<Customer>>(json) ?? new List<Customer>();
+            }
+
+            Console.Write("Enter ID: ");
+            string idInput = Console.ReadLine();
+
+            Guid id;
+            while (true)
+            {
+                if (string.IsNullOrWhiteSpace(idInput))
+                {
+                    Console.Write("Id cannot be empty. Try again: ");
+                }
+                else if (!Guid.TryParse(idInput, out id))
+                {
+                    Console.Write("Id must be a valid GUID. Try again: ");
+                }
+                else
+                {
+                    break;
+                }
+                idInput = Console.ReadLine();
+            }
+
+            Customer customer = customers.FirstOrDefault(c => c.Id == id);
+            if (customer == null)
+            {
+                Console.WriteLine(0);
+            }
+            else
+            {
+                Console.WriteLine($"\nYour Balance: {customer.Balance}\n");
+            }
+        }
+
+
 
 
 
