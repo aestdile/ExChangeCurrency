@@ -463,6 +463,229 @@ namespace CurrencyCource.Services
         }
 
 
+        /*-----------------UpdateProfile-----------------*/
+
+        public string UpdateProfile(Customer customer)
+        {
+            Console.Clear();
+            Console.WriteLine("----------------Update Profile-----------------\n");
+
+            /*--------------First Name----------------*/
+
+            Console.Write("Enter First Name: ");
+            string firstName = Console.ReadLine();
+
+            while (true)
+            {
+                if (string.IsNullOrWhiteSpace(firstName))
+                {
+                    Console.Write("First name cannot be empty. Try again: ");
+                }
+                else if (firstName.Length < 3)
+                {
+                    Console.Write("First name must be at least 3 characters long. Try again: ");
+                }
+                else if (firstName.Length > 40)
+                {
+                    Console.Write("First name must be less than 40 characters long. Try again: ");
+                }
+                else if (!char.IsUpper(firstName[0]))
+                {
+                    Console.Write("First name must start with an uppercase letter. Try again: ");
+                }
+                else if (!firstName.All(c => char.IsLetter(c)))
+                {
+                    Console.Write("First Name must contain only letters. Try again: ");
+                }
+                else
+                {
+                    customer.FirstName = firstName;
+                    break;
+                }
+                firstName = Console.ReadLine();
+            }
+
+
+            /*--------------Last Name----------------*/
+
+            Console.Write("Enter Last Name: ");
+            string lastName = Console.ReadLine();
+
+            while (true)
+            {
+                if (string.IsNullOrWhiteSpace(lastName))
+                {
+                    Console.Write("Last name cannot be empty. Try again: ");
+                }
+                else if (lastName.Length < 3)
+                {
+                    Console.Write("Last name must be at least 3 characters long. Try again: ");
+                }
+                else if (lastName.Length > 40)
+                {
+                    Console.Write("Last name must be less than 40 characters long. Try again: ");
+                }
+                else if (!char.IsUpper(lastName[0]))
+                {
+                    Console.Write("Last name must start with an uppercase letter. Try again: ");
+                }
+                else if (!lastName.All(c => char.IsLetter(c)))
+                {
+                    Console.Write("Last Name must contain only letters. Try again: ");
+                }
+                else
+                {
+                    customer.LastName = lastName;
+                    break;
+                }
+                lastName = Console.ReadLine();
+            }
+
+
+            /*--------------Email----------------*/
+
+            Console.Write("Email: ");
+            string email = Console.ReadLine();
+            while (true)
+            {
+                if (string.IsNullOrWhiteSpace(email))
+                {
+                    Console.Write("Email cannot be empty. Please try again: ");
+                }
+                else if (!email.Contains("@") || !email.Contains("."))
+                {
+                    Console.Write("Email must contain '@' and '.' characters. Please try again: ");
+                }
+                else
+                {
+                    customer.Email = email;
+                    break;
+                }
+                email = Console.ReadLine();
+            }
+
+            /*--------------Password----------------*/
+
+            Console.Write("Password: ");
+            string password = Console.ReadLine();
+
+            while (true)
+            {
+                if (string.IsNullOrWhiteSpace(password))
+                {
+                    Console.Write("Password can not be empty!");
+                }
+                else if (password.Length < 8)
+                {
+                    Console.Write("Password can not be less 8 characters!");
+                }
+                else if (!password.Any(char.IsUpper))
+                {
+                    Console.Write("Password must contain at least one uppercase letter!");
+                }
+                else if (!password.Any(char.IsLower))
+                {
+                    Console.Write("Password must contain at least one lowercase letter!");
+                }
+                else if (!password.Any(char.IsDigit))
+                {
+                    Console.Write("Password must contain at leat one digit!");
+                }
+                else if (!password.Any(ch => "!@#$%^&*()-_=+[{]};:'\",<.>/?".Contains(ch)))
+                {
+                    Console.Write("Password must contain at least one special character!");
+                }
+                else
+                {
+                    customer.Password = password;
+                    break;
+                }
+                password = Console.ReadLine();
+            }
+
+
+            /* ----------------- Phone Number ------------------ */
+            Console.Write("Phone Number (Start With '+998'):  ");
+            string phoneNumber = Console.ReadLine();
+            while (true)
+            {
+                if (string.IsNullOrWhiteSpace(phoneNumber))
+                {
+                    Console.WriteLine("Phone number cannot be empty. Please try again: ");
+                }
+                else if (phoneNumber.Length != 13 || !phoneNumber.StartsWith("+998"))
+                {
+                    Console.WriteLine("Phone number must be in the format +998XXXXXXXXX. Please try again: ");
+                }
+                else
+                {
+                    customer.PhoneNumber = phoneNumber;
+                    break;
+                }
+                phoneNumber = Console.ReadLine();
+            }
+
+
+            /* -----------------Balance ------------------ */
+
+            Console.Write("Balance: ");
+            string balance = Console.ReadLine();
+            while (true)
+            {
+                if (decimal.TryParse(balance, NumberStyles.Any, CultureInfo.InvariantCulture, out decimal money))
+                {
+                    if (money > 0)
+                    {
+                        customer.Balance = money;
+                        break;
+                    }
+                    else
+                    {
+                        Console.WriteLine("Balance must be greater than 0. Please try again: ");
+                    }
+                }
+                else
+                {
+                    Console.WriteLine("Invalid balance. Please enter a valid number: ");
+                }
+                balance = Console.ReadLine();
+            }
+
+            List<Customer> customers = new List<Customer>();
+            if (File.Exists(FilePath))
+            {
+                string json = System.IO.File.ReadAllText(FilePath);
+                customers = Newtonsoft.Json.JsonConvert.DeserializeObject<List<Customer>>(json) ?? new List<Customer>();
+            }
+
+            Customer? existingCustomer = customers.FirstOrDefault(c => c.Id == customer.Id);
+            if (existingCustomer != null)
+            {
+                customer = existingCustomer;
+            }
+            else
+            {
+                return "Customer not found.";
+            }
+
+            existingCustomer.FirstName = customer.FirstName;
+            existingCustomer.LastName = customer.LastName;
+            existingCustomer.Age = customer.Age;
+            existingCustomer.DateOfBirth = customer.DateOfBirth;
+            existingCustomer.Email = customer.Email;
+            existingCustomer.PhoneNumber = customer.PhoneNumber;
+            existingCustomer.Password = customer.Password;
+            existingCustomer.Balance = customer.Balance;
+
+            string jsonString = Newtonsoft.Json.JsonConvert.SerializeObject(customers, Newtonsoft.Json.Formatting.Indented);
+            System.IO.File.WriteAllText(FilePath, jsonString);
+
+
+            return "Update profile is successfull!";
+        }
+
+
+
 
 
 
