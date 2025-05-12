@@ -892,10 +892,114 @@ namespace CurrencyCource.Services
         }
 
 
+        /*-----------------ExchangeCurrency-----------------*/
 
+        public async Task<string> ExchangeCurrency()
+        {
+            Console.Clear();
+            Console.WriteLine("\n----------------Exchange Currency-----------------\n");
 
+            HttpClient client = new HttpClient();
+            string url = "https://cbu.uz/oz/arkhiv-kursov-valyut/json/all/2018-12-11/";
 
+            try
+            {
+                var response = await client.GetStringAsync(url);
+                var currencies = JsonSerializer.Deserialize<List<Currency>>(response);
 
+                Console.WriteLine("Currencies:");
+                foreach (var currency in currencies)
+                {
+                    Console.WriteLine($"{currency.id} - {currency.Ccy} - {currency.CcyNm_UZ} - {currency.Rate} so'm");
+                }
 
+                Console.Write("\nEnter currency code (eg: USD): ");
+                string ccy = Console.ReadLine().ToUpper();
+
+                while (true)
+                {
+                    if (string.IsNullOrWhiteSpace(ccy))
+                    {
+                        Console.Write("Currency code cannot be empty. Try again: ");
+                    }
+                    else if (ccy.Length != 3)
+                    {
+                        Console.Write("Currency code must be 3 characters long. Try again: ");
+                    }
+                    else if (!ccy.All(c => char.IsLetter(c)))
+                    {
+                        Console.Write("Currency code must contain only letters. Try again: ");
+                    }
+                    else if (currencies.Any(c => c.Ccy == ccy))
+                    {
+                        break;
+                    }
+                    ccy = Console.ReadLine().ToUpper();
+                }
+
+                var selectedCurrency = currencies.FirstOrDefault(c => c.Ccy == ccy);
+                if (selectedCurrency == null)
+                {
+                    return "Invalid: This currency is notfound!";
+                }
+
+                Console.WriteLine("1. From Sum To Currency");
+                Console.WriteLine("2. From Currency To Sum");
+                Console.Write("Enter your choice: ");
+                int direction = int.Parse(Console.ReadLine());
+
+                while (true)
+                {
+                    if (direction != 1 && direction != 2)
+                    {
+                        Console.Write("Invalid choice. Please enter 1 or 2: ");
+                    }
+                    else
+                    {
+                        break;
+                    }
+                    direction = int.Parse(Console.ReadLine());
+                }
+
+                Console.Write("Enter Amount: ");
+                decimal amount = decimal.Parse(Console.ReadLine());
+
+                while (true)
+                {
+                    if (amount <= 0)
+                    {
+                        Console.Write("Amount must be greater than 0. Try again: ");
+                    }
+                    else
+                    {
+                        break;
+                    }
+                    amount = decimal.Parse(Console.ReadLine());
+                }
+
+                decimal rate = decimal.Parse(selectedCurrency.Rate, System.Globalization.CultureInfo.InvariantCulture);
+
+                decimal result = 0;
+
+                if (direction == 1)
+                {
+                    result = amount / rate;
+                    return $"{amount} so'm = {result:F2} {ccy}\n";
+                }
+                else if (direction == 2)
+                {
+                    result = amount * rate;
+                    return $"{amount} {ccy} = {result:F2} so'm\n";
+                }
+                else
+                {
+                    return "Invalid choise!";
+                }
+            }
+            catch (Exception ex)
+            {
+                return $"Invalid error: {ex.Message}";
+            }
+        }
     }
 }
