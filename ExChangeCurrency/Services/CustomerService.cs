@@ -416,7 +416,51 @@ namespace CurrencyCource.Services
         }
 
 
+        /*-------------------Enter System--------------------*/
 
+        public async Task<string> EnterSystem()
+        {
+            Console.WriteLine("-----------------Welcome to Currency Exchange Service------------------\n");
+
+            while (true)
+            {
+                Console.WriteLine("Please select an option:\n");
+                Console.WriteLine("1. Update Profile");
+                Console.WriteLine("2. Get Balance");
+                Console.WriteLine("3. Deposit");
+                Console.WriteLine("4. Withdraw");
+                Console.WriteLine("5. Exchange Currency");
+                Console.WriteLine("6. Exit");
+                Console.WriteLine("-----------------------------------------------------\n");
+                Console.Write("Enter your choice: ");
+                string choice = Console.ReadLine();
+                switch (choice)
+                {
+                    case "1":
+                        UpdateProfile(new Customer());
+                        break;
+                    case "2":
+                        GetBalance();
+                        break;
+                    case "3":
+                        Deposit();
+                        break;
+                    case "4":
+                        Withdraw();
+                        break;
+                    case "5":
+                        string result = ExchangeCurrency().GetAwaiter().GetResult();
+                        Console.WriteLine("\n" + result);
+                        break;
+                    case "6":
+                        return "Exiting the program...";
+                        break;
+                    default:
+                        Console.WriteLine("Invalid choice. Please try again.");
+                        break;
+                }
+            }
+        }
 
 
 
