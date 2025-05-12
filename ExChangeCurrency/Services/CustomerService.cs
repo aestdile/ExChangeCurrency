@@ -808,6 +808,88 @@ namespace CurrencyCource.Services
         }
 
 
+        /*-----------------Withdraw-----------------*/
+
+        public void Withdraw()
+        {
+            Console.Clear();
+            Console.WriteLine("----------------Withdraw-----------------\n");
+
+            List<Customer> customers = new List<Customer>();
+            if (File.Exists(FilePath))
+            {
+                string json = System.IO.File.ReadAllText(FilePath);
+                customers = Newtonsoft.Json.JsonConvert.DeserializeObject<List<Customer>>(json) ?? new List<Customer>();
+            }
+
+            Console.Write("Enter ID: ");
+            string idInput = Console.ReadLine();
+
+            Guid id;
+            while (true)
+            {
+                if (string.IsNullOrWhiteSpace(idInput))
+                {
+                    Console.Write("Id cannot be empty. Try again: ");
+                }
+                else if (!Guid.TryParse(idInput, out id))
+                {
+                    Console.Write("Id must be a valid GUID. Try again: ");
+                }
+                else
+                {
+                    break;
+                }
+                idInput = Console.ReadLine();
+            }
+
+            Console.Write("Enter Amount: ");
+            string amountInput = Console.ReadLine();
+
+            decimal amount;
+            while (true)
+            {
+                if (string.IsNullOrWhiteSpace(amountInput))
+                {
+                    Console.Write("Amount cannot be empty. Try again: ");
+                }
+                else if (!decimal.TryParse(amountInput, out amount))
+                {
+                    Console.Write("Amount must be a valid number. Try again: ");
+                }
+                else if (amount <= 0)
+                {
+                    Console.Write("Amount must be greater than 0. Try again: ");
+                }
+                else
+                {
+                    break;
+                }
+                amountInput = Console.ReadLine();
+            }
+
+            Customer customer = customers.FirstOrDefault(c => c.Id == id);
+            if (customer == null)
+            {
+                Console.WriteLine("Customer not found.");
+            }
+            else
+            {
+                if (customer.Balance <= amount)
+                {
+                    Console.WriteLine("Insufficient balance.\n");
+                }
+                else
+                {
+                    customer.Balance -= amount;
+                    string jsonString = Newtonsoft.Json.JsonConvert.SerializeObject(customers, Newtonsoft.Json.Formatting.Indented);
+                    System.IO.File.WriteAllText(FilePath, jsonString);
+
+                    Console.WriteLine($"\nYour Balance{customer.Balance}\n");
+                    Console.WriteLine();
+                }
+            }
+        }
 
 
 
