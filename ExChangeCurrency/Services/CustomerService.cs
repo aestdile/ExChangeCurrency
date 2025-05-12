@@ -331,6 +331,92 @@ namespace CurrencyCource.Services
         }
 
 
+        /*-----------------Login-----------------*/
+
+        public string Login()
+        {
+            Console.Clear();
+            Console.WriteLine("----------------Login-----------------\n");
+
+            Console.Write("Enter ID: ");
+            string idInput = Console.ReadLine();
+
+            Guid id;
+            while (true)
+            {
+                if (string.IsNullOrWhiteSpace(idInput))
+                {
+                    Console.Write("Id cannot be empty. Try again: ");
+                }
+                else if (!Guid.TryParse(idInput, out id))
+                {
+                    Console.Write("Id must be a valid GUID. Try again: ");
+                }
+                else
+                {
+                    break;
+                }
+                idInput = Console.ReadLine();
+            }
+
+
+            Console.Write("Password: ");
+            string password = Console.ReadLine();
+
+            while (true)
+            {
+                if (string.IsNullOrWhiteSpace(password))
+                {
+                    Console.Write("Password can not be empty!");
+                }
+                else if (password.Length < 8)
+                {
+                    Console.Write("Password can not be less 8 characters!");
+                }
+                else if (!password.Any(char.IsUpper))
+                {
+                    Console.Write("Password must contain at least one uppercase letter!");
+                }
+                else if (!password.Any(char.IsLower))
+                {
+                    Console.Write("Password must contain at least one lowercase letter!");
+                }
+                else if (!password.Any(char.IsDigit))
+                {
+                    Console.Write("Password must contain at leat one digit!");
+                }
+                else if (!password.Any(ch => "!@#$%^&*()-_=+[{]};:'\",<.>/?".Contains(ch)))
+                {
+                    Console.Write("Password must contain at least one special character!");
+                }
+                else
+                {
+                    break;
+                }
+                password = Console.ReadLine();
+            }
+
+
+            List<Customer> customers = new List<Customer>();
+            if (File.Exists(FilePath))
+            {
+                string json = System.IO.File.ReadAllText(FilePath);
+                customers = Newtonsoft.Json.JsonConvert.DeserializeObject<List<Customer>>(json) ?? new List<Customer>();
+            }
+
+            Customer? customer = customers.FirstOrDefault(c => c.Id == id && c.Password == password);
+            if (customer != null)
+            {
+                return $"\nWelcome {customer.FirstName} {customer.LastName}!";
+            }
+            else
+            {
+                return "Invalid ID or password. Please try again.";
+            }
+        }
+
+
+
 
 
 
